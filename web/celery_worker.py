@@ -1,13 +1,15 @@
-from celery import Celery
-from googletrans import Translator
+from transformers import ViTImageProcessor, ViTModel
+from PIL import Image
+import requests
 
-celery_app = Celery('tasks', broker='redis://localhost:6379/0')
+url = 'http://images.cocodataset.org/val2017/000000039769.jpg'
+image = Image.open(requests.get(url, stream=True).raw)
 
-@celery_app.task
-def translate_text(text, language):
-    try:
-        translator = Translator()
-        translated_text = translator.translate(text, dest=language).text
-        return translated_text
-    except Exception as e:
-        return str(e)
+processor = ViTImageProcessor.from_pretrained('google/vit-base-patch16-224-in21k')
+model = ViTModel.from_pretrained('google/vit-base-patch16-224-in21k')
+inputs = processor(images=image, return_tensors="pt")
+
+outputs = model(**inputs)
+last_hidden_states = outputs.last_hidden_state
+
+print(last_hidden_states.shape)

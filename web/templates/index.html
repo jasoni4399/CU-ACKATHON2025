@@ -128,14 +128,27 @@
             });
         }
 
+        function classifyImage() {
+            fetch('/classify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('textToTranslate').value = data.predictedClass;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
         function startRecording() {
             document.getElementById('translateForm').style.display = 'none';
             document.getElementById('recordForm').style.display = 'block';
             document.getElementById('actionButton').innerText = 'Record (R)';
-            document.getElementById('actionButton').onclick = function() {
-                // Add your recording logic here
-                console.log('Recording...');
-            };
+            document.getElementById('actionButton').onclick = classifyImage;
             document.getElementById('saveDictButton').style.display = 'block';
         }
 
@@ -149,10 +162,7 @@
                 document.getElementById('translateForm').style.display = 'none';
                 document.getElementById('recordForm').style.display = 'block';
                 document.getElementById('actionButton').innerText = 'Record (R)';
-                document.getElementById('actionButton').onclick = function() {
-                    // Add your recording logic here
-                    console.log('Recording...');
-                };
+                document.getElementById('actionButton').onclick = classifyImage;
                 document.getElementById('saveDictButton').style.display = 'block';
                 document.getElementById('recordTab').classList.add('selected');
                 document.getElementById('playTab').classList.remove('selected');
